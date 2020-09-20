@@ -31,7 +31,7 @@ void setup(){ //The setup starts here....
 void loop() {
   //Calls the function "millis"
   // It returns the time in milliseconds that have elapsed since the device 
-  // restarted which we store in the varible "current_time"
+  // restarted which we store in the variable "current_time"
   // That means for the rest or this loop "current_time" will be equal to that number
   current_time = millis();
 
