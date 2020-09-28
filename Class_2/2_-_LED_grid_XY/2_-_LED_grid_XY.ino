@@ -1,25 +1,25 @@
 // Addressing the XY grid
 
-//This first block is all copypaste and can be left alone except for brightness it just sets up the library
+//This first block is all copy-paste and can be left alone except for brightness it just sets up the library
 
 //led biz begin
-#include <WS2812Serial.h>
-//we'll be using the teensy audio library and it doenst play nicely with neopixels.h or fastled
-// so Paul of pjrc made this much more effiecount version
+#include <WS2812Serial.h> 
+//we'll be using the Teensy audio library and it doesn't play nicely with neopixels.h or fastled
+// so Paul of PJRC made this much more efficient version 
 const int num_of_leds = 64;
-const int pin = 5; // only these pinsa can be used on the teensy 3.2:  1, 5, 8, 10, 31
+const int pin = 5; // only these pins can be used on the Teensy 3.2:  1, 5, 8, 10, 31
 byte drawingMemory[num_of_leds * 3];       //  3 bytes per LED
 DMAMEM byte displayMemory[num_of_leds * 12]; // 12 bytes per LED
 WS2812Serial leds(num_of_leds, displayMemory, drawingMemory, pin, WS2812_GRB);
 
 //1.0 is VERY bright if you're powering it off of 5V
-// this needs to be declades and set to something >0 for the LEDs to work
+// this needs to be declared and set to something >0 for the LEDs to work
 float max_brightness = 0.1;
 //led biz end
 
 
 unsigned long current_time;
-unsigned long prev[8]; //array of 8 varibales named "prev"
+unsigned long prev[8]; //array of 8 variables named "prev"
 int shift;
 float set_hue;
 int xy_sel;
@@ -28,7 +28,7 @@ int x_pot;
 int y_pot;
 
 void setup() {
-  leds.begin(); //msut be done in setup for the LEDs to work.
+  leds.begin(); //must be done in setup for the LEDs to work.
 
   analogReadResolution(12); //0-4095 pot values
   analogReadAveraging(64);  //smooth the readings some
@@ -43,17 +43,17 @@ void loop() {
 
     //its better to not put analogRead in the "bottom" of the loop
     // reading it more slowly will give less noise and we only need
-    // to update it when we'd see the cahnge it causes anyway
+    // to update it when we'd see the change it causes anyway
     
     x_pot = (analogRead(A0) / 4095.0) * 8;  
     y_pot = (analogRead(A1) / 4095.0) * 8;
     xy_sel = x_pot + (y_pot * 8);
     Serial.println(xy_sel);
 
-    //x_count goes from 0-7 and so does y_count but saice we have it arranged
+    //x_count goes from 0-7 and so does y_count but since we have it arranged
     // with one for loop after another we get x_count=0 for y_count from 0-7,
     // then x_count=1 for y_count from 0-7 and so on
-    // this was we can more easly deal with a two dientional array  
+    // this way we can more easily deal with the two dimensional LED array  
     
     for ( int x_count = 0; x_count < 8; x_count++) {
       for ( int y_count = 0; y_count < 8; y_count++) {
@@ -65,7 +65,7 @@ void loop() {
           set_pixel_HSV(xy_sel, set_hue , .9, 1);
         }
       }
-      leds.show(); // aftrer we've set waht we want all the leds to be we send the data out through this function
+      leds.show(); // after we've set what we want all the LEDs to be we send the data out through this function
     }
   }
 
@@ -73,17 +73,17 @@ void loop() {
 
 
 
-//This function is a little differnt than you might see in other libraries but it works pretty similar
+//This function is a little different than you might see in other libraries but it works pretty similar
 // instead of 0-255 you see in other libraries this is all 0-1.0
 // you can copy this to the bottom of any code as long as the declarations at the top in "led biz" are done
 
 //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
 // led to change is 0-63
 // all other are 0.0 to 1.0
-// hue - 0 is red, then throgu hthe ROYGBIV to 1.0 as red again
+// hue - 0 is red, then through the ROYGBIV to 1.0 as red again
 // saturation - 0 is fully white, 1 is fully colored.
 // value - 0 is off, 1 is the value set by max_brightness
-// (it's not called brightness since, unline in photoshop, we're going from black to fully lit up
+// (it's not called brightness since, unlike in photoshop, we're going from black to fully lit up
 
 //based on https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
 
