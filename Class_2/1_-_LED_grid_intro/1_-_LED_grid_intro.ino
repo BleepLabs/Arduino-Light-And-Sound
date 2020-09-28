@@ -1,8 +1,20 @@
-// Starting out with addressable LEDs
+/*
+Starting out with addressable LEDs
 
-// You'll need to install this library https://github.com/PaulStoffregen/WS2812Serial
-//  Click the green code button and download the ZIP
-//  In Arduino click sketch>include library>add zip library... ad give it the one you downloaded 
+You'll need to install this library https://github.com/PaulStoffregen/WS2812Serial
+ Click the green code button and download the ZIP
+ In Arduino click sketch>include library>add zip library... ad give it the one you downloaded 
+
+
+The LED screen has three things that need to be connected using your long jumper wires
+ Din connects to pin 5 of your Teensy
+ +5V can connect to the 5V pin on the top left corer of the Teensy 
+  but 3.3V, anywhere on the red breadboard line, works too and is less bright. 
+ GND connects to ground, anywhere on the blue breadboard line
+
+The other three pins on the screen can be used to chain more LED device 
+
+*/
 
 //This first block is all copy-paste and can be left alone except for brightness it just sets up the library
 
