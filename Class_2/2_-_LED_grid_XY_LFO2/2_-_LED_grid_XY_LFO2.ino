@@ -27,7 +27,7 @@ int xy_count;
 int x_pot;
 int y_pot;
 
-float lfo1;
+float lfo1 = 1.0;
 int lfo_latch;
 int lfo_count;
 
@@ -45,20 +45,23 @@ void loop() {
 
   if (current_time - prev[1] > 10) {
     prev[1] = current_time;
-    
+
     if (lfo_latch == 1) {
-      lfo_count += 3;
+      lfo1 *= 1.01;
     }
     if (lfo_latch == 0) {
-      lfo_count -= 2;
+      lfo1 *= .98;
     }
-    if (lfo_count < 0) {
+    if (lfo1 <= .1) {
+      lfo1 = .1;
       lfo_latch = 1;
     }
-    if (lfo_count > 100) {
+    if (lfo1 >= 1.0) {
+      lfo1 = 1.0;
       lfo_latch = 0;
     }
-    lfo1 = lfo_count / 100.0;
+    Serial.print(lfo1);
+    Serial.println();
 
   }
 
@@ -73,7 +76,7 @@ void loop() {
     x_pot = (analogRead(A0) / 4095.0) * 8;
     y_pot = (analogRead(A1) / 4095.0) * 8;
     xy_sel = x_pot + (y_pot * 8);
-    Serial.println(xy_sel);
+    //Serial.println(xy_sel);
 
     //x_count goes from 0-7 and so does y_count but since we have it arranged
     // with one for loop after another we get x_count=0 for y_count from 0-7,
