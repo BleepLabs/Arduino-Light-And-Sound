@@ -19,6 +19,8 @@ int led2_state = 0;
 unsigned long  previous_time1 = 0;
 unsigned long  previous_time2 = 0;
 unsigned long  previous_time3 = 0;
+unsigned long  previous_time4 = 0;
+
 unsigned long current_time;
 unsigned long interval1 = 50;
 unsigned long interval2 = 50;
@@ -33,15 +35,20 @@ float volume_pot; //floats can hold decimals
 float freq1;
 float freq2;
 int out1, out2, out3;// You can define variables like this too. All of them will be integers equal to 0
-uint32_t dds_tune; //aka unsigned long 
+uint32_t dds_tune; //aka unsigned long
 uint32_t dds_rate;
+
+unsigned long cu, du;
+
 
 void setup() {
   pinMode(led1_pin, OUTPUT);
   pinMode(led2_pin, OUTPUT);
   pinMode(button_pin, INPUT_PULLUP);
 
-  analogWriteResolution(12);
+  analogReadResolution(12); //0-4095 2^12
+  analogWriteResolution(12); //0-4095
+
   //set the rate of our interrupt timer
   dds_rate = 20; //20 microseconds = 50KHz
   dds_tune = (1.00 / (dds_rate * .000001)); //used to make the oscillation at the frequency we want them to be
@@ -49,13 +56,16 @@ void setup() {
 
 }
 
-void osc1() { // code that is run whenever the timer goes off, every 20 micros
+void osc1() {
+  cu = micros();
+  // code that is run whenever the timer goes off, every 20 micros
   //these functions are not hidden away like the onces we've used so far. They are at the bottom of this code
-  out1 = oscillator(0, freq1, 1, .5); //oscillator(voice select, frequency, amplitude, shape)
+ // out1 = oscillator(0, freq1, 1, .5); //oscillator(voice select, frequency, amplitude, shape)
   out2 = oscillator(1, freq2, 1, .5); //  More info on how this works at the bottom of the code
-  out3 = fold((out1 + out2) * volume_pot); //folds the input instead of clipping it based on the level of the volume pot.
+ // out3 = fold((out1 + out2) * volume_pot); //folds the input instead of clipping it based on the level of the volume pot.
 
-  analogWrite(A14, out3 + 2048); // The oscillators produce numbers between -2048 and 2048 but the DAC can't output negatove numbers so we add the offset back in
+  analogWrite(A14, out2 + 2048); // The oscillators produce numbers between -2048 and 2048 but the DAC can't output negatove numbers so we add the offset back in
+  du = micros() - cu;
 }
 
 void loop()
@@ -69,10 +79,18 @@ void loop()
   interval1 = pot1_value / 2;
   interval2 = pot1_value / 5;
   freq1 = pot1_value / 2.0; //divide by a float to make sure we get a float out
-  freq2 = freq1 * .501;
 
-  pot2_value = analogRead(A1) / 4; //this value is 0-1024 but analogWrite is 0-255 so we divide by 4. We'll talk about these funny numbers later
-  volume_pot = (analogRead(A1) / 1024.00) * 8.0; //Take the reading, make it from 0.0 to 1.0, then multiply to get 0.0 to 8.0
+  pot2_value = analogRead(A1);
+  freq2 = map(pot2_value, 0, 4095, 1, 10) * 100;
+
+
+  volume_pot = ((analogRead(A2) / 1024.00) * 8.0) + 1; //Take the reading, make it from 0.0 to 1.0, then multiply to get 0.0 to 8.0
+
+  if (current_time - previous_time4 > 1000) {
+    previous_time4 = current_time;
+    Serial.print(du);
+    Serial.println();
+  }
 
   if (current_time - previous_time1 > interval1) {
     previous_time1 = current_time;
