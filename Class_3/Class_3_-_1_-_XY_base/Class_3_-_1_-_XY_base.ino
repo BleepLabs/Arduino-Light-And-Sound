@@ -1,4 +1,4 @@
-// This code has all the basic framework to make using the LED grid easy
+// use this basic framework as a starting point for todays exercises
 
 
 //led biz begin. don't worry about anything in this section besides max_brightness
@@ -16,7 +16,7 @@ WS2812Serial leds(num_of_leds, displayMemory, drawingMemory, led_data_pin, WS281
 float max_brightness = 0.1;
 //led biz end
 
-//defines are not varibles and are best use for things like like pin numbers for now
+//defines are not variables and are best use for things like like pin numbers for now
 #define button_pin 0
 #define top_left_pot_pin A0
 #define top_right_pot_pin A1
@@ -42,7 +42,7 @@ void setup() {
 
 
 void loop() {
-  current_time = millis();
+  current_time = millis(); 
 
   if (current_time - prev_time[0] > rate1) {
     prev_time[0] = current_time;
