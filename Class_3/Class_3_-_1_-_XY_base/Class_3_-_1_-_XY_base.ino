@@ -1,4 +1,4 @@
-// use this basic framework as a starting point for todays exercises
+// Use this basic framework as a starting point for todays exercises
 
 
 //led biz begin. don't worry about anything in this section besides max_brightness
@@ -17,7 +17,8 @@ float max_brightness = 0.1;
 //led biz end
 
 //defines are not variables and are best use for things like like pin numbers for now
-#define button_pin 0
+#define left_button_pin 0
+#define right_button_pin 1
 #define top_left_pot_pin A0
 #define top_right_pot_pin A1
 #define bottom_left_pot_pin A2
@@ -36,13 +37,15 @@ int rate1 = 30;
 void setup() {
   leds.begin(); //must be done in setup for the LEDs to work.
 
+  pinMode(left_button_pin, INPUT_PULLUP); //must be done when reading buttons
+  pinMode(right_button_pin, INPUT_PULLUP);
   analogReadResolution(12); //0-4095 pot values
   analogReadAveraging(64);  //smooth the readings some
 }
 
 
 void loop() {
-  current_time = millis(); 
+  current_time = millis();
 
   if (current_time - prev_time[0] > rate1) {
     prev_time[0] = current_time;
