@@ -60,7 +60,7 @@ void loop() {
         xy_count = x_count + (y_count * 8); //goes from 0-64
         set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
 
-        if (x_count == 2 && y_count == 3) {
+        if (x_count == 2 && y_count == 3) { //&& means and
           //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
           set_pixel_HSV(xy_count, .3 , 1, 1);
         }
