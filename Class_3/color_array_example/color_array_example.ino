@@ -71,7 +71,10 @@ void loop() {
       led2_state = 0;
     }
   }
-
+  
+  if (current_time - prev_time[0] > rate1) {
+    prev_time[0] = current_time;
+    
   //x_count goes from 0-7 and so does y_count but since we have it arranged
   // with one for loop after another we get x_count=0 for y_count from 0-7,
   // then x_count=1 for y_count from 0-7 and so on
