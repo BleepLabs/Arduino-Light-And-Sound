@@ -71,34 +71,34 @@ void loop() {
       led2_state = 0;
     }
   }
-  
+
   if (current_time - prev_time[0] > rate1) {
     prev_time[0] = current_time;
-    
-  //x_count goes from 0-7 and so does y_count but since we have it arranged
-  // with one for loop after another we get x_count=0 for y_count from 0-7,
-  // then x_count=1 for y_count from 0-7 and so on
-  // this way we can more easily deal with the two dimensional LED array
 
-  for ( int x_count = 0; x_count < 8; x_count++) {
-    for ( int y_count = 0; y_count < 8; y_count++) {
-      xy_count = x_count + (y_count * 8); //goes from 0-64
-      set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
+    //x_count goes from 0-7 and so does y_count but since we have it arranged
+    // with one for loop after another we get x_count=0 for y_count from 0-7,
+    // then x_count=1 for y_count from 0-7 and so on
+    // this way we can more easily deal with the two dimensional LED array
 
-      if (x_count == 0 && y_count == 0) { //&& means and. A single & is a whole other thing
-        //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
-        set_pixel_HSV(xy_count, colors[led2_state], 1, 1);
-      }
+    for ( int x_count = 0; x_count < 8; x_count++) {
+      for ( int y_count = 0; y_count < 8; y_count++) {
+        xy_count = x_count + (y_count * 8); //goes from 0-64
+        set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
 
-      if (x_count == 7 && y_count == 7) { //&& means and. A single & is a whole other thing
-        //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
-        set_pixel_HSV(xy_count, colors[led1_state] , 1, 1);
+        if (x_count == 0 && y_count == 0) { //&& means and. A single & is a whole other thing
+          //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
+          set_pixel_HSV(xy_count, colors[led2_state], 1, 1);
+        }
+
+        if (x_count == 7 && y_count == 7) { //&& means and. A single & is a whole other thing
+          //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
+          set_pixel_HSV(xy_count, colors[led1_state] , 1, 1);
+        }
       }
     }
+    leds.show(); // after we've set what we want all the LEDs to be we send the data out through this function
+    //timing "if" over
   }
-  leds.show(); // after we've set what we want all the LEDs to be we send the data out through this function
-  //timing "if" over
-
 }// loop is over
 
 
