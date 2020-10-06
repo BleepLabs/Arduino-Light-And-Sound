@@ -56,11 +56,8 @@ void loop() {
   if (current_time - prev_time[1] > rate2) {
     prev_time[1] = current_time;
 
-    // if the LED is off turn it on and vice versa:
-    if (led1_state == 0) {
-      led1_state = 1;
-    }
-    else {
+    led1_state = led1_state + 1;
+    if (led1_state > 3) {
       led1_state = 0;
     }
   }
