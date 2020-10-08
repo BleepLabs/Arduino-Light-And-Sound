@@ -34,8 +34,9 @@ int x_pot;
 int y_pot;
 int rate1 = 30;
 
-
-byte glyph[64] = { //we use a byte to conserve RAM
+//aranging the array like this has no effect but makes it easy for us to make designs
+//we use a byte to conserve RAM
+byte glyph[64] = { 
 
   0, 1, 0, 0, 0, 0, 0, 0,
   1, 2, 1, 0, 0, 0, 0, 0,
@@ -78,7 +79,7 @@ void loop() {
         xy_count = x_count + (y_count * 8); //goes from 0-64
         set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
 
-        glyph_location = xy_count - xy_sel; 
+        glyph_location = xy_count - xy_sel; //the bitmap doesn't move, we jsut cahnge where we're looking at it
         if (glyph_location < 0) {
           glyph_location = 0;
         }
