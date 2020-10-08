@@ -13,7 +13,7 @@ WS2812Serial leds(num_of_leds, displayMemory, drawingMemory, led_data_pin, WS281
 
 //1.0 is VERY bright if you're powering it off of 5V
 // this needs to be declared and set to something >0 for the LEDs to work
-float max_brightness = 0.1;
+float max_brightness = 0.2;
 //led biz end
 
 //defines are not variables and are best use for things like like pin numbers for now
@@ -34,16 +34,16 @@ int x_pot;
 int y_pot;
 int rate1 = 30;
 int rate2 = 250;
-int rate3 = 510;
+int rate3 = 50;
 int led1_state = 0;  // The state of LED1 LOW and 0 are synonymous
 int led2_state = 0;  // The LED2 state LOW and 0 are synonymous
 float colors[4] = {.2, .6, .1, .9};
 int x_sel;
 int y_sel;
-#define snake_length 16
+#define snake_length 6
 int prev_pos[snake_length];
 int pos_count, last_xy_sel;
-
+int first_position = 1;
 
 void setup() {
   leds.begin(); //must be done in setup for the LEDs to work.
@@ -52,6 +52,8 @@ void setup() {
   pinMode(right_button_pin, INPUT_PULLUP);
   analogReadResolution(12); //0-4095 pot values
   analogReadAveraging(64);  //smooth the readings some
+
+
 }
 
 
@@ -84,17 +86,25 @@ void loop() {
 
     last_xy_sel = xy_sel;
     x_sel = map(analogRead(top_left_pot_pin), 0, 4095, 0, 7);
-    y_sel = map(analogRead(top_right_pot_pin), 0, 4095, 7, 0);
+    y_sel = 7 - map(analogRead(top_right_pot_pin), 0, 4095, 0, 7);
     xy_sel = x_sel + (y_sel * 8);
 
     if (xy_sel != last_xy_sel) {
-      pos_count++;
-      if (pos_count >= snake_length) {
-        pos_count = 0;
-      }
-      prev_pos[pos_count] = xy_sel;
-    }
 
+      if (first_position == 1) {
+        for (int i = snake_length - 1; i > -1; i--) {
+          prev_pos[i] = xy_sel;
+        }
+        first_position = 0;
+      }
+
+      for (int i = snake_length - 1; i > 0; i--) {
+        prev_pos[i] = prev_pos[i - 1];
+      }
+
+      prev_pos[0] = xy_sel; //where it is now
+
+    }
 
     //x_count goes from 0-7 and so does y_count but since we have it arranged
     // with one for loop after another we get x_count=0 for y_count from 0-7,
@@ -107,18 +117,21 @@ void loop() {
       for ( int y_count = 0; y_count < 8; y_count++) {
         xy_count = x_count + (y_count * 8); //goes from 0-64
         set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
-
-        if (x_count == x_sel && y_count == y_sel) { //&& means and. A single & is a whole other thing
-          //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
-          set_pixel_HSV(xy_count, colors[led2_state], 1, 1);
-        }
       }
     }
-    
-    for ( int trails = 0; trails < snake_length; trails++) {
-      set_pixel_HSV(prev_pos[trails], .5, 1, .3);
+
+    for ( int trails = snake_length - 1; trails > 0; trails--) {
+      float fade = 1.0 - (float(trails) / float(snake_length));
+      set_pixel_HSV(prev_pos[trails], .4 + (fade / 3.0), 1, fade - .1);
+      //Serial.print(trails);Serial.print("-");Serial.print(fade);Serial.print("  ");
     }
-    
+    //Serial.println();
+
+    set_pixel_HSV(prev_pos[0], .4, 1, 1);
+
+
+
+
     leds.show(); // after we've set what we want all the LEDs to be we send the data out through this function
     //timing "if" over
   }
