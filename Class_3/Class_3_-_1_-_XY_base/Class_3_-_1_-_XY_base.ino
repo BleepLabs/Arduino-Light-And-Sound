@@ -46,11 +46,9 @@ void setup() {
 
 void loop() {
   current_time = millis();
-
   if (current_time - prev_time[0] > rate1) {
     prev_time[0] = current_time;
-
-    //x_count goes from 0-7 and so does y_count but since we have it arranged
+//x_count goes from 0-7 and so does y_count but since we have it arranged
     // with one for loop after another we get x_count=0 for y_count from 0-7,
     // then x_count=1 for y_count from 0-7 and so on
     // this way we can more easily deal with the two dimensional LED array
@@ -58,10 +56,10 @@ void loop() {
     for ( int x_count = 0; x_count < 8; x_count++) {
       for ( int y_count = 0; y_count < 8; y_count++) {
         xy_count = x_count + (y_count * 8); //goes from 0-64
-        set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
+     set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
 
         if (x_count == 2 && y_count == 3) { //&& means and. A single & is a whole other thing
-          //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
+       //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
           set_pixel_HSV(xy_count, .3 , 1, 1);
         }
       }
@@ -108,35 +106,35 @@ void set_pixel_HSV(int pixel, float fh, float fs, float fv) {
 
   switch (i) {
     case 0:
-      RedLight = v;
-      GreenLight = tv;
-      BlueLight = pv;
-      break;
+    RedLight = v;
+    GreenLight = tv;
+    BlueLight = pv;
+    break;
     case 1:
-      RedLight = qv;
-      GreenLight = v;
-      BlueLight = pv;
-      break;
+    RedLight = qv;
+    GreenLight = v;
+    BlueLight = pv;
+    break;
     case 2:
-      RedLight = pv;
-      GreenLight = v;
-      BlueLight = tv;
-      break;
+    RedLight = pv;
+    GreenLight = v;
+    BlueLight = tv;
+    break;
     case 3:
-      RedLight = pv;
-      GreenLight = qv;
-      BlueLight = v;
-      break;
+    RedLight = pv;
+    GreenLight = qv;
+    BlueLight = v;
+    break;
     case 4:
-      RedLight = tv;
-      GreenLight = pv;
-      BlueLight = v;
-      break;
+    RedLight = tv;
+    GreenLight = pv;
+    BlueLight = v;
+    break;
     case 5:
-      RedLight = v;
-      GreenLight = pv;
-      BlueLight = qv;
-      break;
+    RedLight = v;
+    GreenLight = pv;
+    BlueLight = qv;
+    break;
   }
   leds.setPixelColor(pixel, RedLight, GreenLight, BlueLight);
 }
