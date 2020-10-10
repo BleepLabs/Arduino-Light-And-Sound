@@ -1,5 +1,4 @@
-// using arrays as bitmaps
-
+//Two types of snake trails
 
 //led biz begin. don't worry about anything in this section besides max_brightness
 #include <WS2812Serial.h>
@@ -13,7 +12,7 @@ WS2812Serial leds(num_of_leds, displayMemory, drawingMemory, led_data_pin, WS281
 
 //1.0 is VERY bright if you're powering it off of 5V
 // this needs to be declared and set to something >0 for the LEDs to work
-float max_brightness = 0.1;
+float max_brightness = 0.2;
 //led biz end
 
 //defines are not variables and are best use for things like like pin numbers for now
@@ -26,30 +25,26 @@ float max_brightness = 0.1;
 
 unsigned long current_time;
 unsigned long prev_time[8]; //array of 8 variables named "prev"
-int glyph_location;
+
 float set_hue;
 int xy_sel;
 int xy_count;
 int x_pot;
 int y_pot;
 int rate1 = 30;
-int x_shift, y_shift;
-#define glyph_width  8
-#define glyph_height 8
-
-//aranging the array like this has makes no difference to the teensy but makes it easy for us to make designs
-// A byte is used to conserve RAM
-// Malth like this can only be done if the value is a #define. it won't work with varables
-byte glyph[glyph_width * glyph_height] = { 
-  1, 0, 0, 0, 0, 0, 1, 0,
-  0, 1, 0, 0, 0, 1, 0, 0,
-  0, 0, 1, 0, 1, 0, 0, 0,
-  0, 0, 0, 2, 0, 0, 0, 0,
-  0, 0, 1, 0, 1, 0, 0, 0,
-  0, 1, 0, 0, 0, 1, 0, 0,
-  1, 0, 0, 0, 0, 0, 1, 0,
-  0, 0, 0, 0, 0, 0, 0, 1,
-};
+int rate2 = 250;
+int rate3 = 50;
+int led1_state = 0;  // The state of LED1 LOW and 0 are synonymous
+int led2_state = 0;  // The LED2 state LOW and 0 are synonymous
+float colors[4] = {.2, .6, .1, .9};
+int x_sel;
+int y_sel;
+#define snake_length 20
+int prev_pos[snake_length];
+int pos_count, last_xy_sel;
+int first_position = 1;
+int trail_type;
+int pot[4];
 
 void setup() {
   leds.begin(); //must be done in setup for the LEDs to work.
@@ -58,6 +53,8 @@ void setup() {
   pinMode(right_button_pin, INPUT_PULLUP);
   analogReadResolution(12); //0-4095 pot values
   analogReadAveraging(64);  //smooth the readings some
+
+
 }
 
 
@@ -67,41 +64,61 @@ void loop() {
   if (current_time - prev_time[0] > rate1) {
     prev_time[0] = current_time;
 
-    //these will go higer than 10 so we can move the shapes areound a little more 
-    x_pot = (analogRead(top_left_pot_pin) / 4095.0) * 10; //0-10
-    y_pot = 10 - ((analogRead(top_right_pot_pin) / 4095.0) * 10); //subtrat by 10 to flip it around 10 - 0
-    xy_sel = x_pot + (y_pot * 8);
+    last_xy_sel = xy_sel;
+    pot[0] = analogRead(top_left_pot_pin);
+    pot[1] = analogRead(top_right_pot_pin);
+    x_sel = map(pot[0], 0, 4095, 0, 7);
+    y_sel = 7 - map(pot[1], 0, 4095, 0, 7); //inversing the output wasn't working for me so i jsut subtracted by 7
+    xy_sel = x_sel + (y_sel * 8);
+    Serial.println(pot[1]);
+    if (xy_sel != last_xy_sel) {
+
+      if (first_position == 1) { //the prev_pos[] array should be filled with the first place the curcor is so this only happens once
+        for (int i = snake_length - 1; i > -1; i--) {
+          prev_pos[i] = xy_sel;
+        }
+        first_position = 0;
+      }
+
+      //shift each space in the array over. 2 goes to 3, 1 goes to 2, etc.
+      // this will work no matter tha snake length
+      for (int i = snake_length - 1; i > 0; i--) {
+        prev_pos[i] = prev_pos[i - 1];
+      }
+
+      prev_pos[0] = xy_sel; //The cursor
+
+    }
 
     //x_count goes from 0-7 and so does y_count but since we have it arranged
     // with one for loop after another we get x_count=0 for y_count from 0-7,
     // then x_count=1 for y_count from 0-7 and so on
     // this way we can more easily deal with the two dimensional LED array
 
+    //Here we jsut clear the screen
     for ( int x_count = 0; x_count < 8; x_count++) {
       for ( int y_count = 0; y_count < 8; y_count++) {
         xy_count = x_count + (y_count * 8); //goes from 0-64
         set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
-
-        //% is remainder aka modulo. remainder = dividend % divisor. https://www.arduino.cc/reference/en/language/structure/arithmetic-operators/remainder/
-        // here x_shift will never equal or go over glyph_width. It'll jsut keep wrapping around
-        x_shift = (x_count + x_pot) % glyph_width;
-        y_shift = (y_count + y_pot) % glyph_height;
-        //the bitmap is moved by changing where we're looking at it. Instead of jsut combining x_count and y_cound we shift it
-        glyph_location = ((x_shift) + ((y_shift) * 8));
-       
-        if (glyph[glyph_location] == 2) {
-          //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
-          set_pixel_HSV(xy_count, .3 , 1, 1); //xy_count is used here, not glyph_location. Otherwise nothing would move
-        }
-
-        if (glyph[glyph_location] == 1) {
-          set_pixel_HSV(xy_count, .5 , 1, 1);
-        }
       }
     }
-    leds.show(); // after we've set what we want all the LEDs to be we send the data out through this function
-  } //timing "if" over
 
+    //off by one errors are sneaky. wa don't want it to start at, say, 6 beacuse the array is 0-5
+    for ( int trails = snake_length - 1; trails > 0; trails--) {
+      float fade = 1.0 - (float(trails) / float(snake_length)); //"cast" these not floating pint numbers as flaots so they will divide propperly
+      set_pixel_HSV(prev_pos[trails], .4 + (fade / 3.0), 1, fade - .1);
+      //Serial.print(trails);Serial.print("-");Serial.print(fade);Serial.print("  ");
+    }
+    //Serial.println();
+
+    set_pixel_HSV(prev_pos[0], .4, 1, 1);
+
+
+
+
+    leds.show(); // after we've set what we want all the LEDs to be we send the data out through this function
+    //timing "if" over
+  }
 }// loop is over
 
 
