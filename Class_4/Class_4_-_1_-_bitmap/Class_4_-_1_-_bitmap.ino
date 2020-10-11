@@ -1,4 +1,7 @@
-// using arrays as bitmaps
+//Using arrays as bitmaps
+// a bitmap is just that, an uncompressed map of bits
+// a bmp file used 3 bytes per pixel to represent the colors
+// here we're using a single value per "color" and then deciding how to display each one
 
 
 //led biz begin. don't worry about anything in this section besides max_brightness
@@ -13,10 +16,11 @@ WS2812Serial leds(num_of_leds, displayMemory, drawingMemory, led_data_pin, WS281
 
 //1.0 is VERY bright if you're powering it off of 5V
 // this needs to be declared and set to something >0 for the LEDs to work
-float max_brightness = 0.1;
+float max_brightness = 0.2;
 //led biz end
 
-//defines are not variables and are best use for things like like pin numbers for now
+//defines are not variables
+// but unlike varibles they can be used in the declaration section and don't take up any memory
 #define left_button_pin 0
 #define right_button_pin 1
 #define top_left_pot_pin A0
@@ -34,13 +38,14 @@ int x_pot;
 int y_pot;
 int rate1 = 30;
 int x_shift, y_shift;
+
 #define glyph_width  8
 #define glyph_height 8
 
 //aranging the array like this has makes no difference to the teensy but makes it easy for us to make designs
 // A byte is used to conserve RAM
-// Malth like this can only be done if the value is a #define. it won't work with varables
-byte glyph[glyph_width * glyph_height] = { 
+// Math like this can only be done if the value is a #define. it won't work with varables
+byte glyph[glyph_width * glyph_height] = {
   1, 0, 0, 0, 0, 0, 1, 0,
   0, 1, 0, 0, 0, 1, 0, 0,
   0, 0, 1, 0, 1, 0, 0, 0,
@@ -67,7 +72,8 @@ void loop() {
   if (current_time - prev_time[0] > rate1) {
     prev_time[0] = current_time;
 
-    //these will go higer than 10 so we can move the shapes areound a little more 
+    //these will go higer than 10 so we can move the shapes areound a little more
+    // map wasn't working as well for me so i went back to this method
     x_pot = (analogRead(top_left_pot_pin) / 4095.0) * 10; //0-10
     y_pot = 10 - ((analogRead(top_right_pot_pin) / 4095.0) * 10); //subtrat by 10 to flip it around 10 - 0
     xy_sel = x_pot + (y_pot * 8);
@@ -83,12 +89,15 @@ void loop() {
         set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
 
         //% is remainder aka modulo. remainder = dividend % divisor. https://www.arduino.cc/reference/en/language/structure/arithmetic-operators/remainder/
-        // here x_shift will never equal or go over glyph_width. It'll jsut keep wrapping around
+        // x_shift will never equal or go over glyph_width. It'll jsut keep wrapping around
+        // so 7%8= 7, 8%8=0, 10%8=2, 17%8=1.
+        // you can use this calculator to try it out //https://www.wolframalpha.com/input/?i=9%257%3D
+      
         x_shift = (x_count + x_pot) % glyph_width;
         y_shift = (y_count + y_pot) % glyph_height;
         //the bitmap is moved by changing where we're looking at it. Instead of jsut combining x_count and y_cound we shift it
         glyph_location = ((x_shift) + ((y_shift) * 8));
-       
+
         if (glyph[glyph_location] == 2) {
           //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
           set_pixel_HSV(xy_count, .3 , 1, 1); //xy_count is used here, not glyph_location. Otherwise nothing would move
