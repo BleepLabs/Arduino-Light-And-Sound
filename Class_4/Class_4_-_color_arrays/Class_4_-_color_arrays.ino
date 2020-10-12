@@ -35,8 +35,6 @@ int rate1 = 30;
 int rate2 = 250;
 int rate3 = 500;
 
-//I used a formula to make a pallet that was a kind of rotating triad
-//
 float hues[8] = {};
 float sats[8] = {1, 1, .8, 1, 1, .8, 1, .8};
 float brights[8] = {.5, 1, 1, 1, 1, 1, 1, .5};
@@ -53,8 +51,8 @@ void setup() {
 
   // a little algorhythm to make a new palet
   // try cahnging these three numbers
-  hues[0] = .3; //starting color
-  float hue_increment = .2;
+  hues[0] = .7; //starting color
+  float hue_increment = .23421;
 
   for (int i = 1; i < 8; i ++) { //start at 1
     hues[i] = hues[i - 1] + hue_increment;
@@ -69,7 +67,9 @@ void setup() {
   }
 
   Serial.println("hue array:");
-  for (int i = 0; i < 7; i ++) {
+  for (int i = 0; i < 8; i ++) {
+    Serial.print(i); 
+    Serial.print("-");
     Serial.print(hues[i], 4); //tells it to always print 4 decimal palces https://www.arduino.cc/reference/en/language/functions/communication/serial/print/
     Serial.print(" "); //print a space
   }
