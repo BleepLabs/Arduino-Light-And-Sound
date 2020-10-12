@@ -53,16 +53,18 @@ void setup() {
 
   // a little algorhythm to make a new palet
   // try cahnging these three numbers
-  hues[0] = .33;
-  hues[1] = hues[0] * 2.0;
-  float hue_increment = 1.0 / 12.0;
-  for (int i = 2; i < 8; i ++) { //start at 2
-    hues[i] = hues[i - 2] + hue_increment;
-    if (hues[i] > 1.0) {
+  hues[0] = .3; //starting color
+  float hue_increment = .2;
+
+  for (int i = 1; i < 8; i ++) { //start at 1
+    hues[i] = hues[i - 1] + hue_increment;
+
+    //while is similar to if but it keeps doing it as long as the contionin is true
+    // we don't want numbers to go over 1.0 and % won't work for floats
+    // so we jsut keep subrating 1 if we're over 1
+    // if we came in with 1.1 or 2.1 we'd exit with 0.1;
+    while (hues[i] > 1.0) {
       hues[i] -= 1.0; //wrap it back around
-    }
-    if (hues[i] < 0) {
-      hues[i] += 1.0;
     }
   }
 
@@ -93,25 +95,6 @@ void loop() {
 
   }
 
-  if (current_time - prev_time[1] > rate3) {
-    prev_time[1] = current_time;
-    if (lfo_latch[0] == 1) {
-      lfo[0]++;
-    }
-    if (lfo_latch[0] == 0) {
-      lfo[0]--;
-    }
-
-    if (lfo[0] >= 6) {
-      lfo[0] = 6;
-      lfo_latch[0] = 0;
-    }
-    if (lfo[0] <= 1) {
-      lfo[0] = 1;
-      lfo_latch[0] = 1;
-    }
-  }
-
   if (current_time - prev_time[0] > rate1) {
     prev_time[0] = current_time;
 
@@ -124,9 +107,9 @@ void loop() {
         xy_count = x_count + (y_count * 8); //goes from 0-64
         set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
 
-        if (y_count == 2 ) { //&& means and. A single & is a whole other thing
+        if (y_count == 2) { //&& means and. A single & is a whole other thing
           //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
-          hue_move = lfo[1]+x_count;
+          hue_move = lfo[1] + x_count;
           //we can't have hue go over 8 but we also don't want to jsut snap it back to 0 every time
           //% is remainder aka modulo. remainder = dividend % divisor. https://www.arduino.cc/reference/en/language/structure/arithmetic-operators/remainder/
           // hue_move will never equal or go over 8. It'll jsut keep wrapping around

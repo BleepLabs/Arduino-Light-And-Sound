@@ -11,8 +11,8 @@ float decrease_jump_size = .995; //it will decrease faster
 void setup() {
   analogReadResolution(12); //0-4095 pot values
   analogReadAveraging(32);  //smooth the readings some
-  raw_reading = analogRead(A0) + 1;
-  interpolated_output = raw_reading;
+  raw_reading = analogRead(A0) + 1; //it cant be 0, otherwise we won't be able to multiply multiply 
+  interpolated_output = raw_reading; //start by jumping right to the pot's position
 
 }
 
