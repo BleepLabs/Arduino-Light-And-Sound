@@ -85,18 +85,22 @@ void loop() {
     int square_starts[16] = {0,2,4,6,16,18,20,22,32,34,36,38,48,50,52,54};
     // sweep through LEDs and set color gradient between left and right columns
     for (int i=0; i<16; i++) {
-      leds.setPixelColor(square_starts[i], left_r + i * (right_r - left_r) / 15, 
-                                   left_g + i * (right_g - left_g) / 15, 
-                                   left_b + i * (right_b - left_b) / 15);
-      leds.setPixelColor(square_starts[i]+1, left_r + i * (right_r - left_r) / 15, 
-                                   left_g + i * (right_g - left_g) / 15, 
-                                   left_b + i * (right_b - left_b) / 15);
-      leds.setPixelColor(square_starts[i]+8, left_r + i * (right_r - left_r) / 15, 
-                                   left_g + i * (right_g - left_g) / 15, 
-                                   left_b + i * (right_b - left_b) / 15);
-      leds.setPixelColor(square_starts[i]+9, left_r + i * (right_r - left_r) / 15, 
-                                   left_g + i * (right_g - left_g) / 15, 
-                                   left_b + i * (right_b - left_b) / 15);
+      leds.setPixelColor(square_starts[i], 
+                                   (left_r + i * (right_r - left_r) / 15)*max_brightness, 
+                                   (left_g + i * (right_g - left_g) / 15)*max_brightness, 
+                                   (left_b + i * (right_b - left_b) / 15)*max_brightness);
+      leds.setPixelColor(square_starts[i]+1, 
+                                   (left_r + i * (right_r - left_r) / 15)*max_brightness, 
+                                   (left_g + i * (right_g - left_g) / 15)*max_brightness, 
+                                   (left_b + i * (right_b - left_b) / 15)*max_brightness);
+      leds.setPixelColor(square_starts[i]+8, 
+                                   (left_r + i * (right_r - left_r) / 15)*max_brightness, 
+                                   (left_g + i * (right_g - left_g) / 15)*max_brightness, 
+                                   (left_b + i * (right_b - left_b) / 15)*max_brightness);
+      leds.setPixelColor(square_starts[i]+9, 
+                                   (left_r + i * (right_r - left_r) / 15)*max_brightness, 
+                                   (left_g + i * (right_g - left_g) / 15)*max_brightness, 
+                                   (left_b + i * (right_b - left_b) / 15)*max_brightness);
     }
     
 

@@ -89,9 +89,9 @@ void loop() {
         xy_count = x_count + (y_count * 8);  
         
         // calculates distance between left/right RGB values and breaks them up into seven chunks
-        leds.setPixelColor(xy_count, left_r + x_count * (right_r - left_r) / 7, 
-                                     left_g + x_count * (right_g - left_g) / 7, 
-                                     left_b + x_count * (right_b - left_b) / 7);
+        leds.setPixelColor(xy_count, (left_r + x_count * (right_r - left_r) / 7)*max_brightness, 
+                                     (left_g + x_count * (right_g - left_g) / 7)*max_brightness, 
+                                     (left_b + x_count * (right_b - left_b) / 7)*max_brightness);
       }
     }
 

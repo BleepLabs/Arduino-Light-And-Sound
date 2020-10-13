@@ -86,9 +86,9 @@ void loop() {
     // sweep through LEDs and set color gradient between left and right columns
     for (int i = 0; i < 64; i++) {
       leds.setPixelColor(i,
-                         left_r + i * (right_r - left_r) / 63,
-                         left_g + i * (right_g - left_g) / 63,
-                         left_b + i * (right_b - left_b) / 63);
+                         (left_r + i * (right_r - left_r) / 63)*max_brightness,
+                         (left_g + i * (right_g - left_g) / 63)*max_brightness,
+                         (left_b + i * (right_b - left_b) / 63)*max_brightness);
     }
 
 
