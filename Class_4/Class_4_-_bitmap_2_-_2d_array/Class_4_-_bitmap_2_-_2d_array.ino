@@ -38,19 +38,37 @@ int x_pot;
 int y_pot;
 int rate1 = 30;
 int x_shift, y_shift;
+int g_sel;
+int pot3;
 
-#define glyph_width  4
-#define glyph_height 4
+#define glyph_width  8
+#define glyph_height 8
 
 //aranging the array like this has makes no difference to the teensy but makes it easy for us to make designs
 // A byte is used to conserve RAM
 // Math like this can only be done if the value is a #define. it won't work with varables
-byte glyph[glyph_width * glyph_height] = {
-  0, 0, 0, 0,
-  0, 1, 0, 0,
-  2, 2, 2, 0,
-  0, 0, 0, 0,
-
+byte glyph[2][glyph_width * glyph_height] =
+{
+  {
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 3, 0, 0, 0, 0,
+    0, 0, 3, 1, 3, 0, 0, 0,
+    0, 3, 2, 2, 2, 3, 0, 0,
+    3, 3, 3, 3, 3, 3, 3, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+  },
+  {
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 1, 0, 0, 0, 0, 0, 0,
+    2, 2, 2, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 3, 0, 0,
+    0, 0, 0, 0, 3, 0, 3, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+  }
 };
 
 void setup() {
@@ -74,6 +92,13 @@ void loop() {
     x_pot = (analogRead(top_left_pot_pin) / 4095.0) * 10; //0-10
     y_pot = 10 - ((analogRead(top_right_pot_pin) / 4095.0) * 10); //subtrat by 10 to flip it around 10 - 0
     xy_sel = x_pot + (y_pot * 8);
+    pot3 = analogRead(bottom_left_pot_pin);
+    if (pot3 < 2000) {
+      g_sel = 0;
+    }
+    if (pot3 >= 2000) {
+      g_sel = 1;
+    }
 
     //x_count goes from 0-7 and so does y_count but since we have it arranged
     // with one for loop after another we get x_count=0 for y_count from 0-7,
@@ -95,18 +120,20 @@ void loop() {
         //the bitmap is moved by changing where we're looking at it. Instead of jsut combining x_count and y_cound we shift it
         glyph_location = ((x_shift) + ((y_shift) * glyph_height));
 
-        if (glyph[glyph_location] == 2) {
-          //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
-          set_pixel_HSV(xy_count, .3 , 1, 1); //xy_count is used here, not glyph_location. Otherwise nothing would move
-        }
+          if (glyph[g_sel][glyph_location] == 2) {
+            //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
+            set_pixel_HSV(xy_count, .3 , 1, 1); //xy_count is used here, not glyph_location. Otherwise nothing would move
+          }
 
-        if (glyph[glyph_location] == 1) {
-          set_pixel_HSV(xy_count, .7 , 1, 1);
-        }
-        if (glyph[glyph_location] == 3) {
-          float r1 = random(0, 100) / 500.0;
-          set_pixel_HSV(xy_count, .8 , 1, r1);
-        }
+          if (glyph[g_sel][glyph_location] == 1) {
+            set_pixel_HSV(xy_count, .7 , 1, 1);
+          }
+          if (glyph[0][glyph_location] == 3) {
+            float r1 = random(0, 100) / 500.0;
+            set_pixel_HSV(xy_count, .8 , 1, r1);
+          }
+        
+
       }
     }
     leds.show(); // after we've set what we want all the LEDs to be we send the data out through this function
