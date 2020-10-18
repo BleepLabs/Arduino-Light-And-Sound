@@ -1,12 +1,12 @@
-// Base for audio and 8x8 LED
+// Sequencer for two sounds and LED display
 
-// install this library by donwlaong the ziphttps://github.com/thomasfredericks/Bounce2
-//or seaching for "bounce2 " sketch>include library>manage libraries
+// install this library by searching for "bounce2 " in  sketch>include library>manage libraries...
 #include <Bounce2.h>
 //info on what bounce does here https://github.com/thomasfredericks/Bounce2#alternate-debounce-algorithms-for-advanced-users-and-specific-cases
-//fuctions https://github.com/thomasfredericks/Bounce2/wiki#methods
+//functions https://github.com/thomasfredericks/Bounce2/wiki#methods
+#define BOUNCE_LOCK_OUT //this tells it what mode to be in. I think it's the better one for music
 
-//audio
+//copied from the audio tool https://www.pjrc.com/teensy/gui/
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -49,41 +49,30 @@ float max_brightness = 0.1;
 #define top_right_pot_pin A1
 #define bottom_left_pot_pin A2
 #define bottom_right_pot_pin A3
-#define BOUNCE_LOCK_OUT //this tells it what mode to be in. I think it's the better one for music
 
-Bounce left_button = Bounce(); // to add more buttons jsut copyt this and cahnge "left_button" to somethign else
+//Make and name bounce objects for each button we want to use
+Bounce left_button = Bounce(); // to add more buttons just copy this and change "left_button" to somethign else
 Bounce middle_button = Bounce();
 Bounce right_button = Bounce();
 
-
-
 unsigned long current_time;
-unsigned long prev_time[8]; //array of 8 variables named "prev"
+unsigned long prev_time[8]; 
 
-float set_hue;
 int xy_sel;
 int xy_count;
-int x_pot;
-int y_pot;
 int rate1 = 30;
-int j;
 float freq[4];
-int top_left_pot, top_right_pot, bottom_left_pot, bottom_right_pot;
+int top_left_pot, top_right_pot, bottom_left_pot, bottom_right_pot; //all of these are separate ints
 int left_b, right_b, middle_b, prev_left_b, prev_right_b, prev_middle_b;
 int seq_rate;
 int seq_position;
-
-//const means to store it in program memory, not RAM
-const float chromatic[88] = {55.00000728, 58.27047791, 61.73542083, 65.40639999, 69.29566692, 73.4162017, 77.78175623, 82.40690014, 87.30706942, 92.49861792, 97.99887197, 103.8261881, 110.0000146, 116.5409558, 123.4708417, 130.8128, 138.5913338, 146.8324034, 155.5635124, 164.8138003, 174.6141388, 184.9972358, 195.9977439, 207.6523763, 220.0000291, 233.0819116, 246.9416833, 261.6255999, 277.1826676, 293.6648067, 311.1270248, 329.6276005, 349.2282776, 369.9944716, 391.9954878, 415.3047525, 440.0000581, 466.1638231, 493.8833665, 523.2511997, 554.3653352, 587.3296134, 622.2540496, 659.2552009, 698.4565551, 739.9889431, 783.9909755, 830.6095048, 880.0001162, 932.3276461, 987.7667329, 1046.502399, 1108.73067, 1174.659227, 1244.508099, 1318.510402, 1396.91311, 1479.977886, 1567.981951, 1661.219009, 1760.000232, 1864.655292, 1975.533466, 2093.004798, 2217.46134, 2349.318453, 2489.016198, 2637.020803, 2793.82622, 2959.955772, 3135.963901, 3322.438019, 3520.000464, 3729.310584, 3951.066931, 4186.009596, 4434.92268, 4698.636906, 4978.032395, 5274.041605, 5587.652439, 5919.911543, 6271.927802, 6644.876037, 7040.000927, 7458.621167, 7902.133861, 8372.019192};
-
-#define bitmap_width  8
-#define bitmap_height 8
-#define seq_length 16
-//aranging the array like this has makes no difference to the teensy but makes it easy for us to make designs
-// A byte is used to conserve RAM
-// Math like this can only be done if the value is a #define. it won't work with varables
 int prev_seq1;
 int array_state;
+
+//"const" means to store it in program memory, not RAM
+const float chromatic[88] = {55.00000728, 58.27047791, 61.73542083, 65.40639999, 69.29566692, 73.4162017, 77.78175623, 82.40690014, 87.30706942, 92.49861792, 97.99887197, 103.8261881, 110.0000146, 116.5409558, 123.4708417, 130.8128, 138.5913338, 146.8324034, 155.5635124, 164.8138003, 174.6141388, 184.9972358, 195.9977439, 207.6523763, 220.0000291, 233.0819116, 246.9416833, 261.6255999, 277.1826676, 293.6648067, 311.1270248, 329.6276005, 349.2282776, 369.9944716, 391.9954878, 415.3047525, 440.0000581, 466.1638231, 493.8833665, 523.2511997, 554.3653352, 587.3296134, 622.2540496, 659.2552009, 698.4565551, 739.9889431, 783.9909755, 830.6095048, 880.0001162, 932.3276461, 987.7667329, 1046.502399, 1108.73067, 1174.659227, 1244.508099, 1318.510402, 1396.91311, 1479.977886, 1567.981951, 1661.219009, 1760.000232, 1864.655292, 1975.533466, 2093.004798, 2217.46134, 2349.318453, 2489.016198, 2637.020803, 2793.82622, 2959.955772, 3135.963901, 3322.438019, 3520.000464, 3729.310584, 3951.066931, 4186.009596, 4434.92268, 4698.636906, 4978.032395, 5274.041605, 5587.652439, 5919.911543, 6271.927802, 6644.876037, 7040.000927, 7458.621167, 7902.133861, 8372.019192};
+
+#define seq_length 16
 
 byte sequencer_array[2][seq_length] =
 {
@@ -102,6 +91,7 @@ void setup() {
   pinMode(right_button_pin, INPUT_PULLUP);
   pinMode(middle_button_pin, INPUT_PULLUP);
 
+  //setting up debouncers
   left_button.attach(left_button_pin); //what pin will it read
   left_button.interval(10); //how many milliseconds of debounce time
 
@@ -115,10 +105,15 @@ void setup() {
   analogReadResolution(12); //0-4095 pot values
   analogReadAveraging(64);  //smooth the readings some
 
-  //audio setup:
+  //This must be done to start the audio library running
+  //We must set aside a certain amount of memory for the audio code to use
+  //The easies way to do this is start with 10 and then if the print out of memory usage
+  //goes above that, simply increase this value until you're a over the vale its reporting
   AudioMemory(10);
 
-  waveform1.begin(WAVEFORM_TRIANGLE); //begin(waveshape) //https://www.pjrc.com/teensy/gui/?info=AudioSynthWaveform
+  //we define all of these in the block of code we copied fro the tool
+  //now we have to tell them what to do
+  waveform1.begin(WAVEFORM_TRIANGLE); //begin(waveshape) list of shapes here https://www.pjrc.com/teensy/gui/?info=AudioSynthWaveform
   waveform1.amplitude(1); //amplitude from 0.0-1.0
 
   mixer1.gain(0, .5); // (channel 0-3, gain 0 is off, .5 full, 1 no change, 2 double and so on
@@ -135,26 +130,28 @@ void setup() {
 
 void loop() {
   current_time = millis();
+
   left_button.update(); //check the debouncers
   middle_button.update();
   right_button.update();
 
   if (left_button.fell()) { //much simpler way of saying  prev_button == 1 && button == 0
-    drum1.noteOn(); //only happens once
+    drum1.noteOn(); //only happens once and does not need a corresponding note off
   }
 
   if (middle_button.fell()) {
     envelope1.noteOn(); //only happens once
   }
   if (middle_button.rose()) {
-    envelope1.noteOff(); //only happens once
+    envelope1.noteOff(); //only happens once. If it don't happen the note will just stay on
   }
 
 
 
   if (current_time - prev_time[3] > seq_rate) {
     prev_time[3] = current_time;
-    seq_position++;
+
+    seq_position++; //the current position we're looking at in the sequencer_array
     if (seq_position > seq_length - 1) {
       seq_position = 0;
     }
@@ -166,19 +163,21 @@ void loop() {
       waveform1.frequency(note);
 
       if (prev_seq1 == 0) {
-        envelope1.noteOn(); //only happens once
+        envelope1.noteOn(); //only make a new note on if the previous step in the array was 0
       }
     }
+
     if (sequencer_array[1][seq_position] == 0) {
       if (prev_seq1 >= 0) {
-        envelope1.noteOff(); //only happens once
+        envelope1.noteOff(); //only tun a note off if the current step is 0 and the last one was greater than 0
       }
     }
 
-    prev_seq1 = sequencer_array[1][seq_position];
+    prev_seq1 = sequencer_array[1][seq_position];  //remember the current value for next time. We could also just look back in the array but this is easy
 
   }
-  if (current_time - prev_time[0] > 5) { // it's better to read a little more sloly that jsut being in the bottom of the loop
+  
+  if (current_time - prev_time[0] > 5) { // it's better to read a little more slowly the much faster bottom of the loop
     prev_time[0] = current_time;
 
     top_left_pot = analogRead(top_left_pot_pin);
@@ -204,25 +203,33 @@ void loop() {
       }
     }
 
-    for ( int seq_step = 0; seq_step < seq_length; seq_step++) {
+    for ( int seq_step = 0; seq_step < seq_length; seq_step++) { //just go through the sequencer
       array_state = sequencer_array[0][seq_step];
 
       if (array_state > 0) {
-        set_pixel_HSV(seq_step + 8, .5 , 1 , 1);
+
+        //make a colorful dot if there's something in the array
+        // move the pixel we're lighting up by 8 
+        set_pixel_HSV(seq_step + 8, .5 , 1 , 1);  
       }
       if (array_state == 0) {
-        set_pixel_HSV(seq_step + 8, 0 , 0 , .1);
+        set_pixel_HSV(seq_step + 8, 0 , 0 , .1); //..or make it dim white if it's empty
       }
 
       array_state = sequencer_array[1][seq_step];
       if (array_state > 0) {
-        float color = array_state / 20.0;
-        set_pixel_HSV(seq_step + 32, color , 1 , 1);
+        //set the color based on the note
+        //there are 88 steps in the chromatic array but you really can't see a different in the values we're using so I just used a smaller value
+s        float color = array_state / 20.0; 
+        // move the pixel we're lighting up by 32 
+        set_pixel_HSV(seq_step + 32, color , 1 , 1); 
       }
       if (array_state == 0) {
         set_pixel_HSV(seq_step + 32, 0 , 0 , .1);
       }
     }
+
+    //light up the current positions medium white
     set_pixel_HSV(seq_position + 8, 0 , 0 , .5);
     set_pixel_HSV(seq_position + 32, 0 , 0 , .5);
 

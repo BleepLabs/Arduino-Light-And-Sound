@@ -1,12 +1,13 @@
-// Base for audio and 8x8 LED
+// Making two separate sounds and controlling them with buttons
+// LED screen lights up when the buttons are used
 
-// install this library by donwlaong the ziphttps://github.com/thomasfredericks/Bounce2
-//or seaching for "bounce2 " sketch>include library>manage libraries
+// install this library by searching for "bounce2 " in  sketch>include library>manage libraries...
 #include <Bounce2.h>
 //info on what bounce does here https://github.com/thomasfredericks/Bounce2#alternate-debounce-algorithms-for-advanced-users-and-specific-cases
-//fuctions https://github.com/thomasfredericks/Bounce2/wiki#methods
+//functions https://github.com/thomasfredericks/Bounce2/wiki#methods
+#define BOUNCE_LOCK_OUT //this tells it what mode to be in. I think it's the better one for music
 
-//audio
+//copied from the audio tool https://www.pjrc.com/teensy/gui/
 #include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -51,22 +52,19 @@ float max_brightness = 0.1;
 #define bottom_right_pot_pin A3
 #define BOUNCE_LOCK_OUT //this tells it what mode to be in. I think it's the better one for music
 
-Bounce left_button = Bounce(); // to add more buttons jsut copyt this and cahnge "left_button" to somethign else
+//Make and name bounce objects for each button we want to use
+Bounce left_button = Bounce(); // to add more buttons just copy this and change "left_button" to somethign else
 Bounce middle_button = Bounce();
 Bounce right_button = Bounce();
 
 
-
 unsigned long current_time;
-unsigned long prev_time[8]; //array of 8 variables named "prev"
+unsigned long prev_time[8]; 
 
 float set_hue;
 int xy_sel;
 int xy_count;
-int x_pot;
-int y_pot;
 int rate1 = 30;
-int j;
 float freq[4];
 int top_left_pot, top_right_pot, bottom_left_pot, bottom_right_pot;
 int left_b, right_b, middle_b, prev_left_b, prev_right_b, prev_middle_b;
@@ -76,12 +74,11 @@ int left_b, right_b, middle_b, prev_left_b, prev_right_b, prev_middle_b;
 #define bitmap_width  8
 #define bitmap_height 8
 
-//aranging the array like this has makes no difference to the teensy but makes it easy for us to make designs
+//arranging the array like this has makes no difference to the Teensy but makes it easy for us to make designs
 // A byte is used to conserve RAM
-// Math like this can only be done if the value is a #define. it won't work with varables
+// Math like this can only be done if the value is a #define. it won't work with variables
 byte bitmap[bitmap_width * bitmap_height] =
 {
-
   0, 0, 0, 1, 1, 0, 0, 0,
   0, 0, 1, 2, 2, 1, 0, 0,
   0, 1, 2, 3, 3, 2, 1, 0,
@@ -112,9 +109,14 @@ void setup() {
   analogReadResolution(12); //0-4095 pot values
   analogReadAveraging(64);  //smooth the readings some
 
-  //audio setup:
+  //This must be done to start the audio library running
+  //We must set aside a certain amount of memory for the audio code to use
+  //The easies way to do this is start with 10 and then if the print out of memory usage
+  //goes above that, simply increase this value until you're a over the vale its reporting
   AudioMemory(10);
 
+  //we define all of these in the block of code we copied fro the tool
+  //now we have to tell them what to do
   waveform1.begin(WAVEFORM_TRIANGLE); //begin(waveshape) //https://www.pjrc.com/teensy/gui/?info=AudioSynthWaveform
   waveform1.amplitude(1); //amplitude from 0.0-1.0
 
@@ -124,7 +126,6 @@ void setup() {
   drum1.frequency(300); //pitch in Hz
 
   envelope1.release(250); //how long will the note fade out in millis after button is released
-
 
 }
 
@@ -137,20 +138,19 @@ void loop() {
   right_button.update();
 
 
-
   if (left_button.fell()) { //much simpler way of saying  prev_button == 1 && button == 0
-    drum1.noteOn(); //only happens once
+    drum1.noteOn(); //only happens once and does not need a corresponding note off
   }
 
   if (middle_button.fell()) {
     envelope1.noteOn(); //only happens once
   }
   if (middle_button.rose()) {
-    envelope1.noteOff(); //only happens once
+    envelope1.noteOff(); //only happens once. If it don't happen the note will just stay on
   }
 
-  if (current_time - prev_time[0] > 5) { // it's better to read a little more sloly that jsut being in the bottom of the loop
-    prev_time[0] = current_time;
+
+  if (current_time - prev_time[0] > 5) { // it's better to read a little more slowly the much faster bottom of the loop    prev_time[0] = current_time;
 
     top_left_pot = analogRead(top_left_pot_pin);
     top_right_pot = analogRead(top_right_pot_pin);
@@ -174,11 +174,11 @@ void loop() {
         set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
 
 
-        if (left_button.read() == 0) {
-          if (bitmap[xy_count] > 0 && x_count < 4) {
+        if (left_button.read() == 0) { //if the button is down
+          if (bitmap[xy_count] > 0 && x_count < 4) { //is the bitmap >0 at this LED and are we in a column less than 4?
             //set_pixel_HSV(led to change, hue,saturation,value aka brightness)
-            float r1 = random(100) / 400.0;
-            float color1 = bitmap[xy_count] / 8.0;
+            float r1 = random(100) / 400.0; //make a new floating point variable that will be filled with a random number between 0-.25
+            float color1 = bitmap[xy_count] / 8.0; //make another float to control the color based on what's in the bitmap
             set_pixel_HSV(xy_count, .2 + color1 , 1 - r1 , .5 - r1);
           }
         }
