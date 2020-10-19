@@ -59,7 +59,7 @@ Bounce right_button = Bounce();
 
 
 unsigned long current_time;
-unsigned long prev_time[8]; 
+unsigned long prev_time[8];
 
 float set_hue;
 int xy_sel;
@@ -173,6 +173,12 @@ void loop() {
         xy_count = x_count + (y_count * 8); //goes from 0-64
         set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
 
+        //light up the corners "||" means or
+        if (xy_count == 0 || xy_count == 7 || xy_count == 56 || xy_count == 63) { 
+          float r1 = random(100) / 500.0; //make a new floating point variable that will be filled with a random number between 0-.25
+          set_pixel_HSV(xy_count, 0 , 0 , r1+.1);
+
+        }
 
         if (left_button.read() == 0) { //if the button is down
           if (bitmap[xy_count] > 0 && x_count < 4) { //is the bitmap >0 at this LED and are we in a column less than 4?
