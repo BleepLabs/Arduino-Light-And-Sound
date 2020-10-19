@@ -56,7 +56,7 @@ Bounce middle_button = Bounce();
 Bounce right_button = Bounce();
 
 unsigned long current_time;
-unsigned long prev_time[8]; 
+unsigned long prev_time[8];
 
 int xy_sel;
 int xy_count;
@@ -176,7 +176,7 @@ void loop() {
     prev_seq1 = sequencer_array[1][seq_position];  //remember the current value for next time. We could also just look back in the array but this is easy
 
   }
-  
+
   if (current_time - prev_time[0] > 5) { // it's better to read a little more slowly the much faster bottom of the loop
     prev_time[0] = current_time;
 
@@ -209,8 +209,8 @@ void loop() {
       if (array_state > 0) {
 
         //make a colorful dot if there's something in the array
-        // move the pixel we're lighting up by 8 
-        set_pixel_HSV(seq_step + 8, .5 , 1 , 1);  
+        // move the pixel we're lighting up by 8
+        set_pixel_HSV(seq_step + 8, .5 , 1 , 1);
       }
       if (array_state == 0) {
         set_pixel_HSV(seq_step + 8, 0 , 0 , .1); //..or make it dim white if it's empty
@@ -220,9 +220,9 @@ void loop() {
       if (array_state > 0) {
         //set the color based on the note
         //there are 88 steps in the chromatic array but you really can't see a different in the values we're using so I just used a smaller value
-s        float color = array_state / 20.0; 
-        // move the pixel we're lighting up by 32 
-        set_pixel_HSV(seq_step + 32, color , 1 , 1); 
+        float color = array_state / 20.0;
+        // move the pixel we're lighting up by 32
+        set_pixel_HSV(seq_step + 32, color , 1 , 1);
       }
       if (array_state == 0) {
         set_pixel_HSV(seq_step + 32, 0 , 0 , .1);
