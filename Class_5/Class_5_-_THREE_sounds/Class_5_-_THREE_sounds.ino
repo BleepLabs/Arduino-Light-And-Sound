@@ -70,7 +70,7 @@ float set_hue;
 int xy_sel;
 int xy_count;
 int rate1 = 30;
-float freq[4];
+float freq[5];
 int top_left_pot, top_right_pot, bottom_left_pot, bottom_right_pot;
 int left_b, right_b, middle_b, prev_left_b, prev_right_b, prev_middle_b;
 
