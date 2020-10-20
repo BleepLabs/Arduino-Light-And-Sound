@@ -103,10 +103,10 @@ void setup() {
   left_button.attach(left_button_pin); //what pin will it read
   left_button.interval(10); //how many milliseconds of debounce time
 
-  middle_button.attach(right_button_pin); //what pin will it read
+  middle_button.attach(middle_button_pin); //what pin will it read
   middle_button.interval(10); //how many milliseconds of debounce time
 
-  right_button.attach(middle_button_pin); //what pin will it read
+  right_button.attach(right_button_pin); //what pin will it read
   right_button.interval(10); //how many milliseconds of debounce time
 
 
