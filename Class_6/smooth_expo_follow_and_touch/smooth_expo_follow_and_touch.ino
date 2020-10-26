@@ -1,13 +1,12 @@
 /*
   In this sketch several examples are shown:
   Smoothing analog readings
-  Maping values into expo or log curves
+  Mapping values into expo or log curves
   Reading touch sensors
   Using envelope followers
-
 */
 
-#include "smooth_scale.h" //insterad of the functions being at the bottom of this code they are in a tab at the top. we jsut need to include it
+#include "smooth_scale.h" //instead of the functions being at the bottom of this code they are in a tab at the top. we jsut need to include it
 
 int  raw_reading[4];
 int  smoothed_reading[4];
@@ -28,13 +27,15 @@ void loop() {
   current_time = millis();
 
   //------Pot scaling
-  //smooth needs to happed fast so read and smooth in the bottom of the loop, not in a timing "if"
   raw_reading[0] = analogRead(A0);
 
- //smooth(select, num of readings, input);
-  // select needs to be diffect for every differnt varible you want to smooth
-  // number of readings can be anything from 7-99 and should be odd for best results. 
-  //The larger the number the more smooth but the less responsive
+  //smooth(select, number of readings, input);
+  // select needs to be different for each variable you want to smooth
+  // number of readings can be anything from 7-99 and should be odd for best results.
+  // The larger the number the more smooth but the less responsive the result will be
+
+  //smooth needs to happen fast so read and smooth in the bottom of the loop, not in a timing "if"
+  // if you put it in a timing if the output will be very slow to respond
   smoothed_reading[0] = smooth(0, 25, raw_reading[0]);
 
   //fscale(input value,  input min, input max, ouput min, output max, curve) {
@@ -43,7 +44,7 @@ void loop() {
   // less than 0 and it's logarithmic
   // greater than 0 and it's exponential
 
-  // for the min and max in I printed out the smoothed readings and saw waht the actaul vales were
+  // for the min and max in I printed out the smoothed readings and saw what the actual vales were
   expo_out = fscale(smoothed_reading[0], 29, 4075, 0, 4095, 0.5);
   log_out =  fscale(smoothed_reading[0], 29, 4075, 0, 4095, -0.5);
 
@@ -60,15 +61,15 @@ void loop() {
 
   if (follower[1] < smoothed_reading[1]) {
     follower[1] *= rise_rate; //the follow jumps up to meet a new reading at one rate
-    //follower[1]=moothed_reading[1]; //or jump to it immediatley
+    //follower[1]=moothed_reading[1]; //or jump to it immediately
   }
 
   if (follower[1] > smoothed_reading[1]) {
-    follower[1] *= fall_rate; //slowly falles to the new reading after it has dropped
+    follower[1] *= fall_rate; //slowly falls to the new reading after it has dropped
   }
 
   //------Printer
-  //printing alwasy needs to be in a timing if. Don't go faster than 5 milliseconds
+  //printing always needs to be in a timing if. Don't go faster than 5 milliseconds
   if (current_time - prev[0] > 40) {
     prev[0] = current_time;
 
@@ -84,10 +85,10 @@ void loop() {
     }
 
     if (print_sel == 1) { //touch and follower
-      //Serial.print(raw_reading[1]);
-      //  Serial.print(" ");
+      // Serial.print(raw_reading[1]);
+      // Serial.print(" ");
       // Serial.print(smoothed_reading[1]);
-      //  Serial.print(" ");
+      // Serial.print(" ");
       Serial.print(follower[1]);
       Serial.println();
     }

@@ -1,5 +1,5 @@
 
-//~~~~ Functions bellow ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Smooth and scale functions
 
 //based on https://playground.arduino.cc/Main/DigitalSmooth/
 // This function continuously samples an input and puts it in an array that is "samples" in length.
