@@ -8,9 +8,6 @@
 // in a library for more functions and data
 // These are all necessary to get audio working but we don't need to do anything besides include them
 
-#include "smooth.h" //smooth is located in a tab at the top instead of in this file. We just have to include it
-// if the file to be included is in the same directory as the main .ino, use " ". Above we see <> this is for files in other directories.
-
 
 #include <Audio.h>
 #include <Wire.h>
