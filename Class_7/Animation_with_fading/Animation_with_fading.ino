@@ -100,9 +100,9 @@ void loop() {
 
   if (current_time - prev_time[2] > 5) { //fast timer to read controls
     prev_time[2] = current_time;
-    pot[1] = (analogRead(top_left_pot_pin) / 4095.0) * 500; //0-200
+    pot[1] = (analogRead(top_left_pot_pin) / 4095.0) * 2000;
     animation_rate = pot[1];
-    fade *= .95;
+    fade *= .98;
     if (fade < .1) {
       fade = 0;
     }
