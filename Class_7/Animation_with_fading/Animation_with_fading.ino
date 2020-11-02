@@ -103,7 +103,7 @@ void loop() {
     pot[1] = (analogRead(top_left_pot_pin) / 4095.0) * 2000;
     animation_rate = pot[1];
     fade *= .98;
-    if (fade < .1) {
+    if (fade < .01) {
       fade = 0;
     }
     inv_fade = 1.0 - fade;
