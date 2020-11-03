@@ -101,25 +101,33 @@ void loop() {
   if (current_time - prev_time[2] > 5) { //fast timer to read controls
     prev_time[2] = current_time;
     pot[1] = (analogRead(top_left_pot_pin) / 4095.0) * 2000;
+    float fade_pot = (analogRead(top_right_pot_pin) / 4095.0) * .2;
+
     animation_rate = pot[1];
-    fade *= .98;
+
+    fade *= 1.0 - fade_pot;
     if (fade < .01) {
       fade = 0;
     }
-    inv_fade = 1.0 - fade;
+    inv_fade *= 1.05;
+    if (inv_fade >= 1) {
+      inv_fade = 1;
+    }
   }
 
   if (current_time - prev_time[1] > animation_rate) { //fast timer to read controls
     prev_time[1] = current_time;
-    animation_frame++;
+    //animation_frame++;
+    animation_frame = random(0, 3);
     if (animation_frame > total_frames - 1) {
       animation_frame = 0;
     }
-    next_frame = animation_frame + 1;
+    next_frame = random(0, 3);
     if (next_frame > total_frames - 1) {
       next_frame = 0;
     }
     fade = 1;
+    inv_fade = .01;
   }
 
   if (current_time - prev_time[0] > rate1) {
@@ -130,7 +138,9 @@ void loop() {
         xy_count = x_count + (y_count * 8); //goes from 0-64
         set_pixel_HSV(xy_count, 0, 0, 0); // turn everything off. otherwise the last "frame" swill still show
 
+
         int current_pixel = bitmap[animation_frame][xy_count];
+
         int next_pixel = bitmap[next_frame][xy_count];
 
         if (current_pixel > 0 ) {
