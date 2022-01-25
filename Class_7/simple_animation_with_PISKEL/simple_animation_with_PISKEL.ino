@@ -1,4 +1,4 @@
-// Using piskel to make animations www.piskelapp.com
+// Using piskel to make animations https://www.piskelapp.com/download
 // start by selecting your cavans size using the resize button on the right
 // 8x8 is the easisest but you can use any size. Look at "Class_4_-_bitmap_3_large_text" for info on scrolling it
 
